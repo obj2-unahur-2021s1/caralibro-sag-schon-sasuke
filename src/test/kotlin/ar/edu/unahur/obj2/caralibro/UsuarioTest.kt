@@ -8,12 +8,19 @@ class UsuarioTest : DescribeSpec({
   describe("Caralibro") {
     val saludoCumpleanios = Texto("Felicidades Pepito, que los cumplas muy feliz")
     val fotoEnCuzco = Foto(768, 1024)
-    val videoPlaya = Video("SD",10)
+    val sD  = SD()
+    val p720 = HD720p()
+    val p1080 = HD1080p()
+    val videoPlaya = Video(sD,10)
+    val videoBoda = Video(p720,12)
+    val videoTortuga = Video(p1080,100)
 
     describe("Una publicación") {
       describe("de tipo foto") {
         it("ocupa ancho * alto * compresion bytes") {
           fotoEnCuzco.espacioQueOcupa().shouldBe(550503)
+          fotoEnCuzco.cambiarFactorDeCompresion(0.9)
+          fotoEnCuzco.espacioQueOcupa().shouldBe(707789)
         }
       }
 
@@ -26,6 +33,8 @@ class UsuarioTest : DescribeSpec({
       describe("de tipo video") {
         it("ocupa según su calidad") {
           videoPlaya.espacioQueOcupa().shouldBe(10)
+          videoBoda.espacioQueOcupa().shouldBe(36)
+          videoTortuga.espacioQueOcupa().shouldBe(600)
         }
       }
 

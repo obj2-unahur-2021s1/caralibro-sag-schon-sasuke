@@ -2,9 +2,11 @@ package ar.edu.unahur.obj2.caralibro
 
 import kotlin.math.ceil
 
-abstract class Publicacion {
+abstract class Publicacion(var privacidad: Privacidad) {
   var cantidadDeMeGusta = 0
   val personasQueDieronMeGusta = mutableListOf<Usuario>()
+
+  lateinit var usuarioCreador : Usuario
 
   abstract fun espacioQueOcupa(): Int
 
@@ -14,9 +16,15 @@ abstract class Publicacion {
       personasQueDieronMeGusta.add(usuario)
     }
   }
+
+  fun puedeSerVistaPor(usuario: Usuario) = privacidad.permiteVerA(usuario,this)
+
+  fun cambiarPrivacidad(privacidadNueva: Privacidad){
+    privacidad = privacidadNueva
+  }
 }
 
-class Foto(val alto: Int, val ancho: Int) : Publicacion() {
+class Foto(val alto: Int, val ancho: Int, privacidad: Privacidad) : Publicacion(privacidad) {
   var factorDeCompresion = 0.7
 
   override fun espacioQueOcupa() = ceil(alto * ancho * factorDeCompresion).toInt()
@@ -26,27 +34,10 @@ class Foto(val alto: Int, val ancho: Int) : Publicacion() {
   }
 }
 
-class Texto(val contenido: String) : Publicacion() {
+class Texto(val contenido: String, privacidad: Privacidad) : Publicacion(privacidad) {
   override fun espacioQueOcupa() = contenido.length
 }
 
-class Video(var calidad: Calidad, val duracion: Int) : Publicacion() {
+class Video(var calidad: Calidad, val duracion: Int, privacidad: Privacidad) : Publicacion(privacidad) {
    override fun espacioQueOcupa(): Int = calidad.espacioQueOcupa(duracion)
-}
-
-abstract class Calidad() {
-  abstract fun espacioQueOcupa(duracion : Int ): Int
-}
-
-class SD() : Calidad(){
-  override fun espacioQueOcupa(duracion : Int ) = duracion
-}
-
-class HD720p() : Calidad(){
-  override fun espacioQueOcupa(duracion : Int ) = duracion * 3
-}
-
-class HD1080p() : Calidad(){
-  val video720 = HD720p()
-  override fun espacioQueOcupa(duracion : Int) = video720.espacioQueOcupa(duracion) * 2
 }

@@ -21,8 +21,6 @@ class Usuario {
 
   fun esMasAmistosoQue(usuario: Usuario) = this.amigos.size > usuario.amigos.size
 
-//  fun puedeVerPublicacion(publicacion: Publicacion) = publicacion.puedeSerVistaPor(this)
-
   fun puedeVerPublicacion(publicacion: Publicacion): Boolean {
     if (publicacion.usuarioCreador == this){
       return true
@@ -34,5 +32,16 @@ class Usuario {
 
   fun agregarExcluidos(usuario: Usuario) = excluidos.add(usuario)
 
-  fun esMejorAmigoDe(usuario: Usuario) = amigos.contains(usuario) and permitidos.contains(usuario) and !excluidos.contains(usuario)
+  fun mejoresAmigos(): List<Usuario> {
+    val mejoresAmigos = mutableListOf<Usuario>()
+    mejoresAmigos.addAll(amigos.filter { usuario -> permitidos.contains(usuario) and !excluidos.contains(usuario) })
+    return mejoresAmigos
+  }
+
+  fun amigoMasPopular() = amigos.maxByOrNull { it.cantidadDeLikes() }
+
+  fun cantidadDeLikes() = publicaciones.sumBy { p -> p.cantidadDeMeGusta }
+
+  fun esStalkerDe(usuario: Usuario) =
+    usuario.publicaciones.count{ it.personasQueDieronMeGusta.contains(this) } > usuario.publicaciones.size * 0.9
 }

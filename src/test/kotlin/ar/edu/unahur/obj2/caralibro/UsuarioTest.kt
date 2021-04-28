@@ -3,6 +3,7 @@ package ar.edu.unahur.obj2.caralibro
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 
 class UsuarioTest : DescribeSpec({
@@ -116,25 +117,86 @@ class UsuarioTest : DescribeSpec({
 
       }
 
-      it("es mejor amigo"){
+      it("es mejor amigo de"){
         val gonza = Usuario()
         val pepe = Usuario()
         val maria = Usuario()
         val sofia = Usuario()
 
         gonza.agregarAmigo(pepe)
-        gonza.agregarPermitidos(pepe)
-        gonza.esMejorAmigoDe(pepe).shouldBeTrue()
-
         gonza.agregarAmigo(maria)
-        gonza.esMejorAmigoDe(maria).shouldBeFalse()
+        gonza.agregarAmigo(sofia)
+        gonza.mejoresAmigos().shouldContainExactlyInAnyOrder()
+
+        gonza.agregarPermitidos(pepe)
+        gonza.agregarPermitidos(maria)
+        gonza.mejoresAmigos().shouldContainExactlyInAnyOrder(maria,pepe)
 
         gonza.agregarPermitidos(sofia)
-        gonza.esMejorAmigoDe(sofia).shouldBeFalse()
+        gonza.mejoresAmigos().shouldContainExactlyInAnyOrder(sofia,pepe,maria)
+
+        gonza.agregarExcluidos(maria)
+        gonza.mejoresAmigos().shouldContainExactlyInAnyOrder(pepe,sofia)
+      }
+
+      it("tiene un amigo mas popular"){
+        val gonza = Usuario()
+        val pepe = Usuario()
+        val sofia = Usuario()
+
+        val fotoGonza = Foto(768,1360,Publico)
+        val videoGonza = Video(HD1080p,30,Publico)
+        gonza.agregarPublicacion(fotoGonza)
+        gonza.agregarPublicacion(videoGonza)
+
+        val fotoPepe = Foto(768,1360,Publico)
+        val videoPepe = Video(HD720p,41,Publico)
+        pepe.agregarPublicacion(fotoPepe)
+        pepe.agregarPublicacion(videoPepe)
+
+        val fotoSofia = Foto(768,1360,Publico)
+        val videoSofia = Video(SD,56,Publico)
+        sofia.agregarPublicacion(fotoSofia)
+        sofia.agregarPublicacion(videoSofia)
+
+        gonza.agregarAmigo(pepe)
         gonza.agregarAmigo(sofia)
-        gonza.esMejorAmigoDe(sofia).shouldBeTrue()
-        gonza.agregarExcluidos(sofia)
-        gonza.esMejorAmigoDe(sofia).shouldBeFalse()
+
+        gonza.darMeGusta(fotoSofia)
+        pepe.darMeGusta(videoSofia)
+        pepe.darMeGusta(fotoSofia)
+        pepe.darMeGusta(fotoGonza)
+        sofia.darMeGusta(fotoGonza)
+        sofia.darMeGusta(fotoPepe)
+        sofia.darMeGusta(videoPepe)
+        gonza.amigoMasPopular().shouldBe(sofia)
+
+        gonza.darMeGusta(videoPepe)
+        gonza.darMeGusta(fotoPepe)
+        gonza.amigoMasPopular().shouldBe(pepe)
+      }
+
+      it("stalkea a otro"){
+        val gonza = Usuario()
+        val pepe = Usuario()
+
+        val fotoGonza = Foto(768,1360,Publico)
+        val videoGonza = Video(HD1080p,30,Publico)
+        val textoGonza = Texto("Este es un texto", Publico)
+        gonza.agregarPublicacion(fotoGonza)
+        gonza.agregarPublicacion(videoGonza)
+        gonza.agregarPublicacion(textoGonza)
+
+        pepe.darMeGusta(fotoGonza)
+        pepe.darMeGusta(videoGonza)
+        pepe.esStalkerDe(gonza).shouldBeFalse()
+
+        pepe.darMeGusta(textoGonza)
+        pepe.esStalkerDe(gonza).shouldBeTrue()
+
+        val foto2Gonza = Foto(768,1360,Publico)
+        gonza.agregarPublicacion(foto2Gonza)
+        pepe.esStalkerDe(gonza).shouldBeFalse()
       }
     }
   }

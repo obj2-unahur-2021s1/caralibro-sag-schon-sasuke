@@ -1,3 +1,5 @@
+import ar.edu.unahur.obj2.caralibro.Usuario
+
 // Pueden usar este archivo para hacer pruebas rápidas,
 // de la misma forma en que usaban el REPL de Wollok.
 
